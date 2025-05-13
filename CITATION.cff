@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below, and also the associated paper."
+authors:
+  - family-names: "Dat"
+    given-names: "Pham Vu Tuan"
+  - family-names: "Doan"
+    given-names: "Long"
+  - family-names: "Binh"
+    given-names: "Huynh Thi Thanh"
+title: "Hsevo: Elevating automatic heuristic design with diversity-driven harmony search and genetic algorithm using LLMs"
+version: "1.0.0"
+date-released: "2024-12-23"
+repository-artifact: "https://github.com/datphamvn/HSEvo"
+keywords:
+  - "heuristic design"
+  - "harmony search"
+  - "genetic algorithm"
+  - "LLMs"
+  - "optimization"
+license: "MIT License"
+
+preferred-citation:
+  type: conference-paper
+  authors:
+    - family-names: "Dat"
+      given-names: "Pham Vu Tuan"
+    - family-names: "Doan"
+      given-names: "Long"
+    - family-names: "Binh"
+      given-names: "Huynh Thi Thanh"
+  title: "Hsevo: Elevating automatic heuristic design with diversity-driven harmony search and genetic algorithm using llms"
+  booktitle: "Proceedings of the AAAI Conference on Artificial Intelligence"
+  volume: "39"
+  number: "25"
+  pages: "26931--26938"
+  year: "2025"
