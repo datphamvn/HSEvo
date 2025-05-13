@@ -13,9 +13,9 @@ We don’t just talk the talk (in large language models), we walk the walk (in e
 - [HSEvo Framework 🏗](#hsevo-framework-)
 - [Shannon–Wiener Diversity Index and the Cumulative Diversity Index 🎨](#shannonwiener-diversity-index-and-the-cumulative-diversity-index-)
 - [How to use? 🔧](#how-to-use-)
-  - [HSEvo Framework 🏗](#hsevo-framework-sub)
-  - [How to setup HSEvo for your problem 🏹](#how-to-setup-hsevo-for-your-problem-)
-  - [Shannon–Wiener Diversity Index and the Cumulative Diversity Index 🎨](#shannonwiener-diversity-index-and-the-cumulative-diversity-index-details-)
+  - [HSEvo Framework](#hsevo-framework-sub)
+  - [How to setup HSEvo for your problem](#how-to-setup-hsevo-for-your-problem-)
+  - [Shannon–Wiener Diversity Index and the Cumulative Diversity Index](#shannonwiener-diversity-index-and-the-cumulative-diversity-index-details-)
 - [Citation 📚](#citation-)
 - [References 🔗](#references-)
 
@@ -74,7 +74,7 @@ SWDI captures diversity at specific points, while CDI aggregates it over time. T
 
 ## How to use? 🔧
 
-### HSEvo Framework 🏗
+### HSEvo Framework
 <span id="hsevo-framework-sub"></span>
 
 1. **Install the dependencies**:
@@ -144,7 +144,7 @@ Check out `./cfg/` for more information.
 
 ---
 
-### How to setup HSEvo for your problem 🏹
+### How to setup HSEvo for your problem
 <span id="how-to-setup-hsevo-for-your-problem-"></span>
 
 1. Define your problem in `./cfg/problem/`.
@@ -156,7 +156,7 @@ Check out `./cfg/` for more information.
 
 ---
 
-### Shannon–Wiener Diversity Index and the Cumulative Diversity Index 🎨
+### Shannon–Wiener Diversity Index and the Cumulative Diversity Index
 <span id="shannonwiener-diversity-index-and-the-cumulative-diversity-index-details-"></span>
 
 For anyone who loves analyzing population diversity, check out [**`Diversity_analysis.ipynb`**](/Diversity_analysis.ipynb).
@@ -173,11 +173,14 @@ If you find our work helpful, please give us a star ⭐ on GitHub and cite our p
 
 ```bibtex
 @inproceedings{dat2025hsevo,
-    title={HSEvo: Elevating Automatic Heuristic Design with Diversity-Driven Harmony Search and Genetic Algorithm Using LLMs}, 
-    author={Pham Vu Tuan Dat and Long Doan and Huynh Thi Thanh Binh},
-    booktitle={The 39th Annual AAAI Conference on Artificial Intelligence},
-    year={2025},
-    note={\url{https://github.com/datphamvn/HSEvo}}
+  title={Hsevo: Elevating automatic heuristic design with diversity-driven harmony search and genetic algorithm using llms},
+  author={Dat, Pham Vu Tuan and Doan, Long and Binh, Huynh Thi Thanh},
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume={39},
+  number={25},
+  pages={26931--26938},
+  year={2025},
+  note={\url{https://github.com/datphamvn/HSEvo}}
 }
 ```
 
