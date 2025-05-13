@@ -29,7 +29,7 @@ preferred-citation:
     - family-names: "Binh"
       given-names: "Huynh Thi Thanh"
   title: "Hsevo: Elevating automatic heuristic design with diversity-driven harmony search and genetic algorithm using llms"
-  booktitle: "Proceedings of the AAAI Conference on Artificial Intelligence"
+  collection-title: "Proceedings of the AAAI Conference on Artificial Intelligence"
   volume: "39"
   number: "25"
   pages: "26931--26938"
