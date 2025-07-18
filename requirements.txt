@@ -20,3 +20,7 @@ sniffio==1.3.0
 tqdm==4.66.1
 typing_extensions
 tiktoken==0.8.0
+networkx
+joblib
+numba
+torch

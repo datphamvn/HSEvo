@@ -295,11 +295,10 @@ class HSEvo:
                 else:  # Otherwise, also provide execution traceback error feedback
                     population[response_id] = self.mark_invalid_individual(population[response_id], traceback_msg)
 
-            if hs_try_idx is None:
-                logging.info(
-                    f"Iteration {self.iteration}, response_id {response_id}: Objective value: {individual['obj']}")
-            else:
-                logging.info(f"Iteration {self.iteration}, hs_try {hs_try_idx}: Objective value: {individual['obj']}")
+        # Log after all population is evaluated
+        valid_objs = [ind["obj"] for ind in population if ind["exec_success"]]
+        best_obj = min(valid_objs) if valid_objs else float("inf")
+        logging.info(f"Eval={self.function_evals}, TokenIn={self.prompt_tokens}, TokenOut={self.completion_tokens}, MaxObj={best_obj}")
 
         return population
 
@@ -341,10 +340,6 @@ class HSEvo:
             self.elitist = population[best_sample_idx]
             logging.info(f"Iteration {self.iteration}: Elitist: {self.elitist['obj']}")
 
-        logging.info(f"Iteration {self.iteration} finished...")
-        logging.info(f"Best obj: {self.best_obj_overall}, Best Code Path: {self.best_code_path_overall}")
-        logging.info(f"LLM usage: prompt_tokens = {self.prompt_tokens}, completion_tokens = {self.completion_tokens}")
-        logging.info(f"Function Evals: {self.function_evals}")
         self.iteration += 1
 
     def random_select(self, population: list[dict]) -> list[dict]:
