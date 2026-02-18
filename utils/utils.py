@@ -138,9 +138,21 @@ def extract_code_from_generator(content):
 
     if code_string is None:
         return None
-    # Add import statements if not present
+    
+    # Add import statements if not present or insufficient
+    if "import numpy as np" not in code_string:
+         code_string = "import numpy as np\n" + code_string
+         
+    # Check if numpy is used in function signature but not imported globally (e.g. inside function)
+    if "np." in code_string and "import numpy as np" in code_string:
+        # Move import numpy to the top if it is inside the function
+        lines = code_string.split('\n')
+        # Check if the first line is import numpy
+        if not lines[0].strip().startswith("import numpy"):
+             code_string = "import numpy as np\n" + code_string
+
     if "import" not in code_string:
-        code_string = "import numpy as np\nimport random\nimport math\nimport scipy\nimport torch\n" + code_string
+        code_string = "import numpy as np\nimport random\nimport math\nimport scipy\n" + code_string
     return code_string
 
 
@@ -207,6 +219,11 @@ def extract_to_hs(input_string: str):
 
     if signature_start_index is not None and signature_end_index is not None:
         function_signature = function_block[signature_start_index:signature_end_index + 1]
+        
+        # Clean up the function signature from potential default values that might be corrupted (e.g. .eps suffix)
+        # This regex looks for parameter definitions and cleans any trailing garbage before the next comma or closing paren
+        function_signature = re.sub(r'(\w+\s*:\s*\w+\s*=\s*[\d.e-]+)(\.[a-zA-Z]+)', r'\1', function_signature)
+        
         for param in parameter_ranges:
             pattern = rf"(\b{param}\b[^=]*=)[^,)]+"
             replacement = r"\1 {" + param + "}"
