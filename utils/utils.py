@@ -139,7 +139,7 @@ def extract_code_from_generator(content):
     if code_string is None:
         return None
 
-    global_imports = "import numpy as np\nimport random\nimport math\nimport scipy\n"
+    global_imports = "import numpy as np\nimport random\nimport math\nimport scipy\nimport torch\n"
     code_string = global_imports + code_string
     return code_string
 
