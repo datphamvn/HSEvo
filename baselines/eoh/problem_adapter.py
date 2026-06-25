@@ -28,7 +28,7 @@ class Prompts:
         if self.prompt_func_name.startswith('select_next_node'):
             self.prompt_func_outputs = ['next_node']
         elif self.prompt_func_name.startswith('priority'):
-            self.prompt_func_outputs = ['priority']
+            self.prompt_func_outputs = ['priorities']
         elif self.prompt_func_name.startswith('heuristics'):
             self.prompt_func_outputs = ['heuristics_matrix']
         elif self.prompt_func_name.startswith('crossover'):
@@ -69,7 +69,7 @@ class Problem:
         if self.problem_type == "tsp_constructive":
             from .original.prompts.tsp_greedy import GetPrompts
             self.prompts = GetPrompts()
-        elif self.problem_type == "bpp_online":
+        elif self.problem_type == "online":
             from .original.prompts.bpp_online import GetPrompts
             self.prompts = GetPrompts()
         else:
