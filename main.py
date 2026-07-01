@@ -4,6 +4,8 @@ import os
 from pathlib import Path
 import subprocess
 
+import numpy as np
+
 
 ROOT_DIR = os.getcwd()
 logging.basicConfig(level=logging.INFO)
@@ -11,6 +13,11 @@ logging.basicConfig(level=logging.INFO)
 @hydra.main(version_base=None, config_path="cfg", config_name="config")
 def main(cfg):
     workspace_dir = Path.cwd()
+    # Seed the evolutionary-loop RNG for reproducibility / cross-framework parity.
+    seed = cfg.get("seed", None)
+    if seed is not None:
+        np.random.seed(int(seed))
+        logging.info(f"Seed: {seed}")
     # Set logging level
     logging.info(f"Workspace: {workspace_dir}")
     logging.info(f"Project Root: {ROOT_DIR}")

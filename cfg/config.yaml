@@ -10,9 +10,15 @@ hydra:
 # The chosen algorithm
 algorithm: hsevo
 
+# RNG seed for the evolutionary loop (selection / harmony search), so runs are
+# reproducible and can be matched against other frameworks.
+seed: 2024
+
 # LLM parameters
 model: openai/gpt-4o-mini-2024-07-18  # LLM model
 temperature: 1  # temperature for chat completion
+max_tokens: 32768  # max output tokens per LLM call (set to your model's supported output length)
+enable_thinking: true  # keep reasoning/<think> on (recommended for reasoning models)
 
 # Main GA loop parameters
 max_fe: 450 # maximum number of function evaluations

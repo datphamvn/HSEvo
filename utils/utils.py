@@ -48,7 +48,28 @@ def extract_description(response: str) -> tuple[str, str]:
     return desc_string
 
 
-def multi_chat_completion(messages_list: list[list[dict]], n, model, temperature):
+def _get_message_text(message) -> str:
+    """Extract the final answer text from a chat message, with support for
+    reasoning / "thinking" models.
+
+    - Prefers ``message.content`` and returns ``''`` instead of ``None`` so the
+      downstream code extraction never crashes.
+    - Strips inline chain-of-thought (``<think>...</think>``) so only the final
+      answer is parsed. When the server uses a reasoning parser the thinking is
+      already in a separate field and ``content`` is clean, so this is a no-op.
+    """
+    content = getattr(message, 'content', None) or ''
+    # Remove complete <think>...</think> spans.
+    content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL)
+    # If only a closing tag remains (opening tag missing / truncated), keep the
+    # text that follows it (the final answer).
+    if '</think>' in content:
+        content = content.rsplit('</think>', 1)[-1]
+    return content.strip()
+
+
+def multi_chat_completion(messages_list: list[list[dict]], n, model, temperature,
+                          max_tokens=None, enable_thinking=None):
     """
     An example of messages_list:
 
@@ -88,24 +109,55 @@ def multi_chat_completion(messages_list: list[list[dict]], n, model, temperature
         num_workers = 2
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
-        args = [(n, messages, model, temperature) for messages in messages_list]
+        args = [(n, messages, model, temperature, max_tokens, enable_thinking) for messages in messages_list]
         choices = executor.map(lambda p: chat_completion(*p), args)
 
     contents: list[str] = []
     for choice in choices:
         for c in choice:
-            contents.append(c.message.content)
+            contents.append(_get_message_text(c.message))
     return contents
 
 
-def chat_completion(n: int, messages: list[dict], model: str, temperature: float) -> list[dict]:
+def chat_completion(n: int, messages: list[dict], model: str, temperature: float,
+                    max_tokens: int = None, enable_thinking: bool = None) -> list[dict]:
     """
-    Generate n responses using OpenAI Chat Completions API
-    """
+    Generate n responses using OpenAI Chat Completions API.
 
+    `max_tokens` (output length) and `enable_thinking` (reasoning) are supplied
+    from the Hydra config (`cfg.max_tokens`, `cfg.enable_thinking`). Reasoning /
+    "thinking" is ON by default when not specified.
+    """
+    # Reasoning ("thinking") defaults to ON.
+    if enable_thinking is None:
+        enable_thinking = True
+
+    # --- Local / OpenAI-compatible server support (e.g. vLLM) ---------------
+    # Pass `api_base`/`api_key` explicitly so routing does not depend on how the
+    # OPENAI_API_BASE env var is (or isn't) exported. Convenience: model ids
+    # containing 'vllm' default to the local server when OPENAI_API_BASE is unset;
+    # any other model (Qwen, etc.) must set OPENAI_API_BASE explicitly.
+    kwargs = {}
+    api_base = os.environ.get('OPENAI_API_BASE') or ('http://localhost:8888/v1' if 'vllm' in model else None)
+    if api_base:
+        kwargs['api_base'] = api_base
+        kwargs['api_key'] = os.environ.get('OPENAI_API_KEY', 'EMPTY')
+        # Output budget (set to your model's supported length via cfg.max_tokens).
+        if max_tokens is None:
+            max_tokens = 32768 if enable_thinking else 16384
+        kwargs['max_tokens'] = int(max_tokens)
+        # Reasoning toggle for vLLM / reasoning models (e.g. Qwen3.x). When
+        # thinking is on, the chain-of-thought is stripped by `_get_message_text`
+        # so only the final answer is parsed. Only sent when relevant, so plain
+        # OpenAI-compatible servers are not passed an unknown request field.
+        is_reasoning_model = ('vllm' in model) or ('qwen' in model.lower())
+        if is_reasoning_model or enable_thinking:
+            kwargs['extra_body'] = {'chat_template_kwargs': {'enable_thinking': enable_thinking}}
+
+    response_cur = None
     for attempt in range(30):
         try:
-            response_cur = completion(model=model, messages=messages, temperature=temperature, n=n)
+            response_cur = completion(model=model, messages=messages, temperature=temperature, n=n, **kwargs)
             break
         except Exception as e:
             logging.info(f"Attempt {attempt + 1} failed with error: {e}")

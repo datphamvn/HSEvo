@@ -14,6 +14,7 @@ We don’t just talk the talk (in large language models), we walk the walk (in e
 - [Shannon–Wiener Diversity Index and the Cumulative Diversity Index 🎨](#shannonwiener-diversity-index-and-the-cumulative-diversity-index-)
 - [How to use? 🔧](#how-to-use-)
   - [HSEvo Framework](#hsevo-framework-sub)
+  - [Using a local LLM via vLLM (OpenAI-compatible)](#using-a-local-llm-via-vllm-)
   - [How to setup HSEvo for your problem](#how-to-setup-hsevo-for-your-problem-)
   - [Shannon–Wiener Diversity Index and the Cumulative Diversity Index](#shannonwiener-diversity-index-and-the-cumulative-diversity-index-details-)
 - [Citation 📚](#citation-)
@@ -109,6 +110,8 @@ Where:
    - **algorithm**: The chosen algorithm `["hsevo", "reevo", "eoh", "reevo-hs", "reevo-rf"]` (`reevo-hs` is `reevo` enhanced with harmony search, `reevo-rf` is `reevo` where short-term & long-term reflection are replaced by flash reflection; Read our paper for detailed information.)
    - **model**: The LLM model name used to generate heuristics. See all model support at [litellm.ai docs](https://docs.litellm.ai/docs/providers).
    - **temperature**: The temperature for the LLM’s text generation.  
+   - **max_tokens**: Max output tokens per LLM call (set to your model's supported output length).  
+   - **enable_thinking**: Keep reasoning/`<think>` on for reasoning models (on by default).  
    - **max_fe**: The maximum number of function evaluations for LLM-EPS framework.  
    - **timeout**: The time budget (in seconds) for evaluating a single heuristic.  
 
@@ -141,6 +144,31 @@ Check out `./cfg/` for more information.
    - By default, logs of the processes and intermediate results are stored in `./outputs/main/`.
    - Datasets are created dynamically.
    - To execute FunSearch, visit [`./baselines/funsearch`](/baselines/funsearch/).
+
+---
+
+### Using a local LLM via vLLM (OpenAI-compatible)
+<span id="using-a-local-llm-via-vllm-"></span>
+
+You can run HSEvo against a self-hosted, OpenAI-compatible server such as [vLLM](https://docs.vllm.ai)
+
+1. **Serve a model** (the served id is what you pass to `model=`) and verify it is up:
+
+   ```bash
+   vllm serve <YOUR_MODEL_ID> --port 8888
+   curl http://localhost:8888/v1/models   # should list the served model id
+   ```
+
+2. **Run HSEvo** with the `openai/` provider prefix (use the id from step 1):
+
+   ```bash
+   python main.py algorithm=... problem=... model=openai/<YOUR_MODEL_ID>
+   ```
+
+   - **Endpoint**: point HSEvo at your server with `export OPENAI_API_BASE=http://<host>:<port>/v1`. As a convenience, model ids containing `vllm` default to `http://localhost:8888/v1` when `OPENAI_API_BASE` is unset.
+   - **API key**: optional (defaults to `EMPTY`); set `OPENAI_API_KEY` if your server requires one.
+   - **Output length**: set `max_tokens` in [`cfg/config.yaml`](/cfg/config.yaml) (default **32k**), or override per run, e.g. `max_tokens=16384`. Set it to your model's supported output length.
+   - **Reasoning / "thinking" models**: `enable_thinking` in [`cfg/config.yaml`](/cfg/config.yaml) is **on by default**; disable per run with `enable_thinking=false`. When on, the chain-of-thought is stripped automatically (in [`utils/utils.py`](/utils/utils.py) → `chat_completion`) so only the final code is parsed.
 
 ---
 
