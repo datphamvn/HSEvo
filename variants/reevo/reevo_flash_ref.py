@@ -500,7 +500,7 @@ class ReEvoRF:
             self.print_flash_reflection_prompt = False
 
         flash_reflection_res = multi_chat_completion([messages], 1, self.cfg.model, self.cfg.temperature)[0]
-        self.cal_usage_LLM([messages], flash_reflection_res)
+        self.cal_usage_LLM([messages], [flash_reflection_res])
         print(flash_reflection_res)
         analyze_start = flash_reflection_res.find("**Analysis:**") + len("**Analysis:**")
         exp_start = flash_reflection_res.find("**Experience:**")
@@ -546,7 +546,7 @@ class ReEvoRF:
             self.print_comprehensive_reflection_prompt = False
 
         comprehensive_response = multi_chat_completion([messages], 1, self.cfg.model, self.cfg.temperature)[0]
-        self.cal_usage_LLM([messages], comprehensive_response)
+        self.cal_usage_LLM([messages], [comprehensive_response])
         self.str_comprehensive_memory = self.external_knowledge + '\n' + comprehensive_response
 
         file_name = f"problem_iter{self.iteration}_comprehensive_reflection_prompt.txt"

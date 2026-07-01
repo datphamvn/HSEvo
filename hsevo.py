@@ -99,12 +99,13 @@ class HSEvo:
     def cal_usage_LLM(self, lst_prompt, lst_completion, encoding_name="cl100k_base"):
         """Returns the number of tokens in a text string."""
         encoding = tiktoken.get_encoding(encoding_name)
-        for i in range(len(lst_prompt)):
-            for message in lst_prompt[i]:
+        for messages in lst_prompt:
+            for message in messages:
                 for key, value in message.items():
                     self.prompt_tokens += len(encoding.encode(value))
 
-            self.completion_tokens += len(encoding.encode(lst_completion[i]))
+        for completion in lst_completion:
+            self.completion_tokens += len(encoding.encode(completion))
 
     def init_population(self) -> None:
         # Evaluate the seed function, and set it as Elite
@@ -401,7 +402,7 @@ class HSEvo:
 
         flash_reflection_res = multi_chat_completion([messages], 1, self.cfg.model, self.cfg.temperature,
                                                      self.cfg.max_tokens, self.cfg.enable_thinking)[0]
-        self.cal_usage_LLM([messages], flash_reflection_res)
+        self.cal_usage_LLM([messages], [flash_reflection_res])
         print(flash_reflection_res)
         analyze_start = flash_reflection_res.find("**Analysis:**") + len("**Analysis:**")
         exp_start = flash_reflection_res.find("**Experience:**")
@@ -448,7 +449,7 @@ class HSEvo:
 
         comprehensive_response = multi_chat_completion([messages], 1, self.cfg.model, self.cfg.temperature,
                                                        self.cfg.max_tokens, self.cfg.enable_thinking)[0]
-        self.cal_usage_LLM([messages], comprehensive_response)
+        self.cal_usage_LLM([messages], [comprehensive_response])
         self.str_comprehensive_memory = self.external_knowledge + '\n' + comprehensive_response
 
         file_name = f"problem_iter{self.iteration}_comprehensive_reflection_prompt.txt"
