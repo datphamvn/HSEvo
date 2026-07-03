@@ -6,6 +6,8 @@ import subprocess
 
 import numpy as np
 
+from utils.utils import set_llm_parallelism
+
 
 ROOT_DIR = os.getcwd()
 logging.basicConfig(level=logging.INFO)
@@ -18,6 +20,8 @@ def main(cfg):
     if seed is not None:
         np.random.seed(int(seed))
         logging.info(f"Seed: {seed}")
+    # Cap on concurrent LLM calls (local / OpenAI-compatible servers).
+    set_llm_parallelism(cfg.get("n_parallel", 8))
     # Set logging level
     logging.info(f"Workspace: {workspace_dir}")
     logging.info(f"Project Root: {ROOT_DIR}")

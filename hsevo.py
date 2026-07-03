@@ -590,7 +590,7 @@ class HSEvo:
                 tmp_str = tmp_str.replace(('{' + list(parameter_ranges)[j] + '}'), str(harmony_memory[i][j]))
                 if tmp_str == str_code:
                     return None
-            str_create_pop.append(tmp_str)
+            str_create_pop.append("```python\n" + tmp_str + "\n```")
 
         population_hs = self.responses_to_population(str_create_pop, try_hs_idx)
         return self.evaluate_population(population_hs, try_hs_idx)
@@ -658,16 +658,31 @@ class HSEvo:
             self.function_evals -= self.cfg.hm_size
             return None
 
+        # [HS-CHECK]
+        init_objs = [ind["obj"] for ind in population_hs if ind["exec_success"]]
+        n_distinct = len(set(init_objs))
+        init_best = min(init_objs) if init_objs else float("inf")
+
         for iteration in range(self.cfg.max_iter):
             new_harmony = self.create_new_harmony(harmony_memory, bounds)
             population_hs, harmony_memory = self.update_harmony_memory(population_hs, harmony_memory, new_harmony,
                                                                        func_block, parameter_ranges, iteration)
         best_obj_id = self.find_best_obj(population_hs)
         population_hs[best_obj_id]["tryHS"] = True
+        hs_best = population_hs[best_obj_id]["obj"]
+        logging.info(f"[HS-CHECK] iter={self.iteration} hm_size={self.cfg.hm_size} "
+                     f"valid={len(init_objs)} distinct_init_objs={n_distinct} "
+                     f"init_best={init_best} hs_best={hs_best} "
+                     f"improved_over_init={hs_best < init_best}")
         return population_hs[best_obj_id]
 
     def evolve(self):
+      generation = 0
+      try:
         while self.function_evals < self.cfg.max_fe:
+            generation += 1
+            logging.info(f"===== [Gen {generation}] start (function_evals={self.function_evals}, "
+                         f"best_obj={self.best_obj_overall}) =====")
             # If all individuals are invalid, stop
             if all([not individual["exec_success"] for individual in self.population]):
                 raise RuntimeError(f"All individuals are invalid. Please check the stdout files in {os.getcwd()}.")
@@ -715,5 +730,9 @@ class HSEvo:
                 else:
                     try_hs_num -= 1
             self.update_iter()
+            logging.info(f"===== [Gen {generation}] done (function_evals={self.function_evals}, "
+                         f"best_obj={self.best_obj_overall}) =====")
+      except RuntimeError as e:
+        logging.info(f"HSEvo evolution terminated: {e}")
 
-        return self.best_code_overall, self.best_code_path_overall
+      return self.best_code_overall, self.best_code_path_overall

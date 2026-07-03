@@ -165,10 +165,8 @@ You can run HSEvo against a self-hosted, OpenAI-compatible server such as [vLLM]
    python main.py algorithm=... problem=... model=openai/<YOUR_MODEL_ID>
    ```
 
-   - **Endpoint**: point HSEvo at your server with `export OPENAI_API_BASE=http://<host>:<port>/v1`. As a convenience, model ids containing `vllm` default to `http://localhost:8888/v1` when `OPENAI_API_BASE` is unset.
+   - **Endpoint**: point HSEvo at your server with `export OPENAI_API_BASE=http://<host>:<port>/v1`.
    - **API key**: optional (defaults to `EMPTY`); set `OPENAI_API_KEY` if your server requires one.
-   - **Output length**: set `max_tokens` in [`cfg/config.yaml`](/cfg/config.yaml) (default **32k**), or override per run, e.g. `max_tokens=16384`. Set it to your model's supported output length.
-   - **Reasoning / "thinking" models**: `enable_thinking` in [`cfg/config.yaml`](/cfg/config.yaml) is **on by default**; disable per run with `enable_thinking=false`. When on, the chain-of-thought is stripped automatically (in [`utils/utils.py`](/utils/utils.py) → `chat_completion`) so only the final code is parsed.
 
 ---
 

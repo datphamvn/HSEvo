@@ -68,8 +68,20 @@ def _get_message_text(message) -> str:
     return content.strip()
 
 
+# Default number of concurrent LLM calls for local / OpenAI-compatible servers.
+# Overridable from the Hydra config (`cfg.n_parallel`) via `set_llm_parallelism`,
+# which main.py calls once at startup.
+_LLM_NUM_PARALLEL = 5
+
+
+def set_llm_parallelism(n):
+    """Set the global cap on concurrent LLM calls (from `cfg.n_parallel`)."""
+    global _LLM_NUM_PARALLEL
+    _LLM_NUM_PARALLEL = max(1, int(n))
+
+
 def multi_chat_completion(messages_list: list[list[dict]], n, model, temperature,
-                          max_tokens=None, enable_thinking=None):
+                          max_tokens=None, enable_thinking=None, n_parallel=None):
     """
     An example of messages_list:
 
@@ -106,7 +118,8 @@ def multi_chat_completion(messages_list: list[list[dict]], n, model, temperature
         # Transform messages if n > 1
         messages_list *= n
         n = 1
-        num_workers = 2
+        limit = n_parallel if n_parallel is not None else _LLM_NUM_PARALLEL
+        num_workers = min(max(len(messages_list), 1), max(1, int(limit)))
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
         args = [(n, messages, model, temperature, max_tokens, enable_thinking) for messages in messages_list]
@@ -133,26 +146,16 @@ def chat_completion(n: int, messages: list[dict], model: str, temperature: float
         enable_thinking = True
 
     # --- Local / OpenAI-compatible server support (e.g. vLLM) ---------------
-    # Pass `api_base`/`api_key` explicitly so routing does not depend on how the
-    # OPENAI_API_BASE env var is (or isn't) exported. Convenience: model ids
-    # containing 'vllm' default to the local server when OPENAI_API_BASE is unset;
-    # any other model (Qwen, etc.) must set OPENAI_API_BASE explicitly.
     kwargs = {}
-    api_base = os.environ.get('OPENAI_API_BASE') or ('http://localhost:8888/v1' if 'vllm' in model else None)
+    api_base = os.environ.get('OPENAI_API_BASE')
     if api_base:
         kwargs['api_base'] = api_base
         kwargs['api_key'] = os.environ.get('OPENAI_API_KEY', 'EMPTY')
-        # Output budget (set to your model's supported length via cfg.max_tokens).
-        if max_tokens is None:
-            max_tokens = 32768 if enable_thinking else 16384
-        kwargs['max_tokens'] = int(max_tokens)
-        # Reasoning toggle for vLLM / reasoning models (e.g. Qwen3.x). When
-        # thinking is on, the chain-of-thought is stripped by `_get_message_text`
-        # so only the final answer is parsed. Only sent when relevant, so plain
-        # OpenAI-compatible servers are not passed an unknown request field.
-        is_reasoning_model = ('vllm' in model) or ('qwen' in model.lower())
-        if is_reasoning_model or enable_thinking:
-            kwargs['extra_body'] = {'chat_template_kwargs': {'enable_thinking': enable_thinking}}
+
+        if max_tokens is not None:
+            kwargs['max_tokens'] = int(max_tokens)
+        if enable_thinking:
+            kwargs['extra_body'] = {'chat_template_kwargs': {'enable_thinking': True}}
 
     response_cur = None
     for attempt in range(30):

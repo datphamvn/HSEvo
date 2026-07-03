@@ -507,7 +507,7 @@ class ReEvoHS:
                 tmp_str = tmp_str.replace(('{' + list(parameter_ranges)[j] + '}'), str(harmony_memory[i][j]))
                 if tmp_str == str_code:
                     return None
-            str_create_pop.append(tmp_str)
+            str_create_pop.append("```python\n" + tmp_str + "\n```")
 
         population_hs = self.responses_to_population(str_create_pop, try_hs_idx)
         return self.evaluate_population(population_hs, try_hs_idx)
