@@ -2,3 +2,8 @@ __pycache__/
 .idea/
 outputs/
 venv/
+
+# Astro project page (website/)
+website/node_modules/
+website/dist/
+website/.astro/

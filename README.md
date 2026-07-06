@@ -1,7 +1,10 @@
 # HSEvo: Elevating Automatic Heuristic Design with Diversity-Driven Harmony Search and Genetic Algorithm Using LLMs
 
-Welcome to **HSEvo** — the code implementation from the paper:
-[**HSEvo: Elevating Automatic Heuristic Design with Diversity-Driven Harmony Search and Genetic Algorithm Using LLMs**](https://doi.org/10.1609/aaai.v39i25.34898) | [Poster (AAAI 2025)](https://underline.io/lecture/112578-hsevo-elevating-automatic-heuristic-design-with-diversity-driven-harmony-search-and-genetic-algorithm-using-llms).
+Welcome to **HSEvo**, the code implementation from the paper:
+[**HSEvo: Elevating Automatic Heuristic Design with Diversity-Driven Harmony Search and Genetic Algorithm Using LLMs**](https://doi.org/10.1609/aaai.v39i25.34898)
+
+[![Poster (AAAI 2025)](https://img.shields.io/badge/Poster-AAAI%202025-0066CC?style=for-the-badge)](https://underline.io/lecture/112578-hsevo-elevating-automatic-heuristic-design-with-diversity-driven-harmony-search-and-genetic-algorithm-using-llms)
+[![Project Page](https://img.shields.io/badge/Project%20Page-Visit-2ea44f?style=for-the-badge)](https://datphamvn.github.io/HSEvo/)
 
 We don’t just talk the talk (in large language models), we walk the walk (in evolutionary leaps).
 
