@@ -30,3 +30,8 @@ dependencies = [
     "tqdm==4.66.1",
     "typing-extensions>=4.14.1",
 ]
+
+[project.optional-dependencies]
+embeddings = [
+    "transformers>=4.40.0",
+]

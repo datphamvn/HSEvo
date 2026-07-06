@@ -190,6 +190,37 @@ You can run HSEvo against a self-hosted, OpenAI-compatible server such as [vLLM]
 
 For anyone who loves analyzing population diversity, check out [**`Diversity_analysis.ipynb`**](/Diversity_analysis.ipynb).
 
+#### Use as a library
+
+The metrics are also packaged as a small, framework-agnostic library in [`diversity/`](/diversity/). The core metrics depend only on `numpy` and `scipy`; the default CodeT5+ embedder additionally needs `transformers` (install via `pip install .[embeddings]`).
+
+```python
+from diversity import compute_diversity
+
+# Embeds the snippets with CodeT5+ by default, then computes both metrics
+result = compute_diversity(list_of_code_strings)
+print(result.swdi, result.cdi)
+```
+
+Bring your own embeddings (no `torch`/`transformers` required) to integrate with any framework:
+
+```python
+from diversity import compute_diversity_from_embeddings
+
+result = compute_diversity_from_embeddings(my_numpy_embeddings)  # shape (n, d)
+print(result.as_dict())  # {"swdi": ..., "cdi": ...}
+```
+
+Or run it from the command line:
+
+```bash
+# From a JSON file containing a list of code strings
+python -m diversity --input snippets.json
+
+# From all Python files under a folder
+python -m diversity --folder ./problems/... --glob "*.py"
+```
+
 
 ---
 
