@@ -1,0 +1,189 @@
+---
+title: HSEvo
+description: Diversity-driven harmony search and genetic algorithm for automatic heuristic design with LLMs
+favicon: favicon.svg
+thumbnail: thumbnail.png
+theme: device
+---
+
+import Header from "./components/Header.astro";
+import Figure from "./components/Figure.astro";
+import Picture from "./components/Picture.astro";
+import Wide from "./components/Wide.astro";
+import { RunProgress } from "./components/RunProgress.tsx";
+
+import hsevoPipeline from "./assets/hsevo-pipeline.png";
+import diversityAnalysis from "./assets/analysis_llm-esp.jpg";
+
+<Header
+  title="HSEvo: Elevating Automatic Heuristic Design with Diversity-Driven Harmony Search and Genetic Algorithm Using LLMs"
+  conference="AAAI 2025"
+  authors={[
+    {
+      name: "Pham Vu Tuan Dat",
+      url: "https://github.com/datphamvn",
+      institution: "Hanoi University of Science and Technology",
+    },
+    {
+      name: "Long Doan",
+      institution: "George Mason University",
+    },
+    {
+      name: "Huynh Thi Thanh Binh",
+      institution: "Hanoi University of Science and Technology",
+    },
+  ]}
+  links={[
+    {
+      name: "Paper",
+      url: "https://doi.org/10.1609/aaai.v39i25.34898",
+      icon: "ri:file-pdf-2-line",
+    },
+    {
+      name: "Code",
+      url: "https://github.com/datphamvn/HSEvo",
+      icon: "ri:github-line",
+    },
+    {
+      name: "arXiv",
+      url: "https://arxiv.org/abs/2412.14995",
+      icon: "academicons:arxiv",
+    },
+    {
+      name: "Poster",
+      url: "https://underline.io/lecture/112578-hsevo-elevating-automatic-heuristic-design-with-diversity-driven-harmony-search-and-genetic-algorithm-using-llms",
+      icon: "ri:slideshow-2-line",
+    },
+  ]}
+/>
+
+<div class="mt-8 mb-10 border-y border-zinc-200 py-8 dark:border-zinc-700">
+
+<h2 class="mt-0 mb-4 text-center">Abstract</h2>
+
+Automatic Heuristic Design (AHD) is an active research area due to its utility in solving complex search and NP-hard combinatorial optimization problems in the real world. The recent advancements in Large Language Models (LLMs) introduce new possibilities by coupling LLMs with evolutionary computation to automatically generate heuristics, known as LLM-based Evolutionary Program Search (LLM-EPS). While previous LLM-EPS studies obtained great performance on various tasks, there is still a gap in understanding the properties of heuristic search spaces and achieving a balance between exploration and exploitation, which is a critical factor in large heuristic search spaces.
+
+In this study, we address this gap by proposing two diversity measurement metrics and perform an analysis on previous LLM-EPS approaches, including FunSearch, EoH, and ReEvo. Results on black-box AHD problems reveal that while EoH demonstrates higher diversity than FunSearch and ReEvo, its objective score is unstable. Conversely, ReEvo's reflection mechanism yields good objective scores but fails to optimize diversity effectively. With this finding in mind, we introduce **HSEvo**, an adaptive LLM-EPS framework that maintains a balance between diversity and convergence with a harmony search algorithm. Through experimentation, we find that HSEvo achieved high diversity indices and good objective scores while remaining cost-effective.
+
+<div class="not-prose mt-6 flex flex-wrap justify-center gap-2">
+  <span class="rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">Automatic Heuristic Design</span>
+  <span class="rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">LLM-EPS</span>
+  <span class="rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">Harmony Search</span>
+  <span class="rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">Genetic Algorithm</span>
+  <span class="rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">Diversity</span>
+  <span class="rounded-full border border-zinc-300 px-3 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-600 dark:text-zinc-300">Combinatorial Optimization</span>
+</div>
+
+</div>
+
+## Overview
+
+Our contributions are:
+
+- **Two diversity measurement metrics**: the **Shannon–Wiener Diversity Index (SWDI)** and the **Cumulative Diversity Index (CDI)**, to evaluate the evolutionary progress of populations within the LLM-EPS framework.
+- **HSEvo**, a novel framework that balances diversity and objective performance to improve the optimization process.
+
+HSEvo advances LLM-EPS by outperforming FunSearch, EoH, and ReEvo on benchmarks including Bin Packing Problem (BPP), Orienteering Problem (OP), and Traveling Salesman Problem (TSP). Its integration of diversity-driven harmony search and flash reflection achieves superior objective scores and high diversity indices.
+
+This repository includes HSEvo as well as baselines (**EoH**, **FunSearch**, **ReEvo**) for problems such as TSP, CVRP, OP, MKP, and BPP, using solvers including Ant Colony Optimization (ACO), Guided Local Search (GLS), and constructive heuristics.
+
+## HSEvo Framework
+
+<Figure>
+  <Picture
+    slot="figure"
+    src={hsevoPipeline}
+    alt="Overview of the HSEvo framework pipeline"
+  />
+  <Fragment slot="caption">
+    HSEvo combines genetic algorithm operators with harmony search and flash reflection to balance exploration and exploitation in LLM-EPS.
+  </Fragment>
+</Figure>
+
+LLM-based Evolutionary Program Search (LLM-EPS) combines Large Language Models with evolutionary computation to explore heuristic search spaces as functional programs. HSEvo extends this paradigm with harmony search to adaptively balance population diversity and convergence.
+
+### How HSEvo Works, Step by Step
+
+HSEvo evolves the population one operator per iteration: initialization, then repeating rounds of selection, flash reflection, crossover, elitist mutation, and harmony search. The interactive view below replays a real run: press play to watch each operator produce individuals (dots, colored by operator) while the pipeline steps on the right highlight in sync and the blue line tracks the best objective found so far.
+
+<Wide>
+  <RunProgress client:only="react" />
+</Wide>
+
+<p class="text-sm text-zinc-500 dark:text-zinc-400">
+  This is a small illustrative run used only to visualize how HSEvo explores the search space, not the experiments reported in the paper. In it, selection starts each round, then crossover, elitist mutation, and harmony search each contribute individuals while the best objective improves from about 3.95 to 1.73 (lower is better). Individuals worse than the plotted range are clamped to the top edge. See the paper for the full benchmark results.
+</p>
+
+## Diversity Metrics
+
+<Wide>
+  <Figure>
+    <Picture
+      slot="figure"
+      src={diversityAnalysis}
+      alt="Shannon-Wiener Diversity Index and Cumulative Diversity Index analysis for LLM-EPS frameworks"
+    />
+    <Fragment slot="caption">
+      Shannon–Wiener Diversity Index (SWDI) and Cumulative Diversity Index (CDI) for analyzing population diversity in LLM-EPS.
+    </Fragment>
+  </Figure>
+</Wide>
+
+**Shannon–Wiener Diversity Index (SWDI)** measures population diversity at a specific moment, assessing how evenly individuals are distributed across clusters in the search space. Higher values promote exploration; lower values indicate over-concentration.
+
+**Cumulative Diversity Index (CDI)** evaluates overall population diversity across the entire search process using a minimum spanning tree (MST) of vector representations. Higher CDI values ensure robust exploration and help prevent excessive convergence on local optima.
+
+Together, SWDI and CDI provide a detailed view of diversity dynamics for effective search strategy design.
+
+## Results
+
+We compare HSEvo against FunSearch, EoH, and ReEvo on three automatic heuristic design problems: Bin Packing Online (BPO), Traveling Salesman Problem with a Guided Local Search solver (TSP), and Orienteering Problem with an ACO solver (OP). All frameworks run under identical settings (gpt-4o-mini as generator and reflector, a 425K token budget, 3 independent runs). We report the Cumulative Diversity Index (CDI, higher is better) and the objective score (Obj., lower is better), averaged over runs.
+
+<Wide>
+
+| Method | BPO CDI ↑ | BPO Obj. ↓ | TSP CDI ↑ | TSP Obj. ↓ | OP CDI ↑ | OP Obj. ↓ |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| FunSearch | 4.97 ± 0.24 | 2.05 ± 2.01 | 5.24 ± 0.14 | 0.09 ± 0.06 | – | – |
+| EoH | **5.86 ± 0.49** | 3.17 ± 2.97 | **5.81 ± 0.23** | 1.09 ± 3.11 | **6.17 ± 0.42** | −14.62 ± 0.22 |
+| ReEvo | 4.91 ± 0.53 | 2.48 ± 3.74 | 5.15 ± 0.19 | 0.05 ± 0.06 | 5.02 ± 0.13 | −14.54 ± 0.21 |
+| **HSEvo (ours)** | 5.68 ± 0.35 | **1.07 ± 1.11** | 5.41 ± 0.21 | **0.02 ± 0.03** | 5.67 ± 0.41 | **−14.62 ± 0.12** |
+
+</Wide>
+
+HSEvo achieves the best objective score on all three problems while maintaining high diversity. On BPO it outperforms FunSearch and ReEvo by a large margin, confirming that promoting diversity is crucial for optimizing the population effectively. While EoH attains the highest CDI, its objective scores are unstable; HSEvo strikes a better balance between diversity and convergence.
+
+Ablations further show that harmony search and flash reflection each contribute: adding harmony search to ReEvo improves both CDI and objective on OP, and HSEvo's flash reflection reaches the best diversity and objective when given a larger token budget. See the paper for full tables and analysis.
+
+## Getting Started
+
+Install dependencies and run HSEvo on a problem:
+
+```bash
+pip install -r requirements.txt
+
+python main.py \
+    algorithm=hsevo \
+    model=openai/gpt-4o-mini-2024-07-18 \
+    problem=bpp_online \
+    init_pop_size=30 \
+    max_fe=450
+```
+
+See the [GitHub repository](https://github.com/datphamvn/HSEvo) for full configuration options, local LLM setup via vLLM, and instructions for adding new problems.
+
+## Citation
+
+If you find our work helpful, please cite:
+
+```bibtex
+@inproceedings{dat2025hsevo,
+  title={Hsevo: Elevating automatic heuristic design with diversity-driven harmony search and genetic algorithm using llms},
+  author={Dat, Pham Vu Tuan and Doan, Long and Binh, Huynh Thi Thanh},
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume={39},
+  number={25},
+  pages={26931--26938},
+  year={2025},
+  note={\url{https://github.com/datphamvn/HSEvo}}
+}
+```
